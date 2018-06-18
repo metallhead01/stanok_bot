@@ -4,6 +4,7 @@ from telebot import types
 from keyboard_buttons import *
 
 
+
 TOKEN = '584772341:AAEzHX5p_MCaqZQFmE-oySdF98bro0IPZgw'
 STICKER_ID = 'CAADAgADEQIAAvJ-ggwzgX6aU1rEAwI'
 bot = telebot.TeleBot(TOKEN)
@@ -22,6 +23,7 @@ def echo_messages(message: Message):
     text = message.text
     if text == '1. Станки':
         bot.send_message(message.chat.id, "Выберите модель:", reply_markup=level_2_stanki)
+        bot.register_next_step_handler(message.chat.id, "Выберите модель:", reply_markup=level_2_stanki)
     elif text == 'Highflex 1650 FC':
         bot.send_message(message.chat.id, "Выберите причину:", reply_markup=level_3_stanki)
     elif text == 'HPL 300/38/22':

@@ -1,6 +1,6 @@
 from telebot import types
 
-level_1_menu = types.ReplyKeyboardMarkup()
+level_1_menu = types.ReplyKeyboardMarkup(resize_keyboard=True)
 menu_1 = types.KeyboardButton('1. Станки')
 menu_2 = types.KeyboardButton('2. Нечеткое задание (проблемы оформления)')
 menu_3 = types.KeyboardButton('3. Склад')
@@ -9,7 +9,7 @@ menu_5 = types.KeyboardButton('5. Нет задания – огрехи пла�
 level_1_menu.row(menu_1, menu_2)
 level_1_menu.row(menu_3, menu_4, menu_5)
 
-level_2_stanki = types.ReplyKeyboardMarkup()
+level_2_stanki = types.ReplyKeyboardMarkup(resize_keyboard=True)
 stanok_1_1 = types.KeyboardButton('Highflex 1650 FC')
 stanok_2_1 = types.KeyboardButton('HPL 300/38/22')
 stanok_3_1 = types.KeyboardButton('KTD 720')
