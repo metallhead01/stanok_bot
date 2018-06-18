@@ -4,8 +4,9 @@ from telebot import types
 from keyboard_buttons import *
 
 
-
-TOKEN = '584772341:AAEzHX5p_MCaqZQFmE-oySdF98bro0IPZgw'
+with open('telegram.token', 'r') as f:
+    token = f.read()
+TOKEN = token
 STICKER_ID = 'CAADAgADEQIAAvJ-ggwzgX6aU1rEAwI'
 bot = telebot.TeleBot(TOKEN)
 

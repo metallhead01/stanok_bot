@@ -1,7 +1,6 @@
 import imaplib
 import email
 import smtplib
-import time
 
 
 # -------------------------------------------------
