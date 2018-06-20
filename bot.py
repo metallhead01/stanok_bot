@@ -1,7 +1,7 @@
 import telebot
 from telebot.types import Message
 from telebot import types
-from keyboard_buttons import *
+import keyboard_buttons
 
 
 with open('telegram.token', 'r') as f:
@@ -11,11 +11,22 @@ STICKER_ID = 'CAADAgADEQIAAvJ-ggwzgX6aU1rEAwI'
 bot = telebot.TeleBot(TOKEN)
 
 
+
 @bot.message_handler(commands=['start', 'help'])
 def command_handler(message: Message):
-    bot.send_message(message.chat.id, "Выберите вариант:", reply_markup=level_1_menu)
+    keyboard = keyboard_buttons.level_1_menu()
+    bot.send_message(message.chat.id, "Выберите вариант:", reply_markup=keyboard)
 
 
+@bot.callback_query_handler(func=lambda x: True)
+def callback_handler(callback_query):
+    message = callback_query.message
+    data = callback_query.data
+    if data == 'Problem with machine':
+        keyboard = keyboard_buttons.level_2_menu()
+        bot.send_message(message.chat.id, "Укажите причину:", reply_markup=keyboard)
+
+"""
 # Объявим функцию, которая будет отвечать на сообщения
 @bot.edited_channel_post_handler(content_types=['text']) # одну и ту же функцию мы можем декорировать несколькими декораторами
 @bot.message_handler(content_types=['text'])
@@ -47,5 +58,6 @@ def sticker_handler(message: Message):
     # bot.send_sticker(message.chat.id, STICKER_ID) # если нужно отвечать конкретным стикером
     bot.send_sticker(message.chat.id, message.sticker)
 
-
+"""
 bot.polling(timeout=60)  # Настройки таймаута, выбираем в зависимости от качества Интернет-соединения timeout=60
+
