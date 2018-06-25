@@ -4,39 +4,31 @@ import requests
 import telebot
 from telebot.types import Message
 import keyboard_buttons
-from collections import defaultdict
+from contracts import contract
 
 
 with open('telegram.token', 'r') as f:
     token = f.read()
-
 TOKEN = token
 MAIN_URL = f'https://api.telegram.org/bot{TOKEN}'
+USER_STATE_dict = {}
+
 
 bot = telebot.TeleBot(TOKEN)
-is_running = True
-"""
-PROCESSED, CONFIRMED = range(2)
-USER_STATE = defaultdict(lambda: PROCESSED)
 
 
-def get_state(query):
-    return USER_STATE[query]
-
-"""
-"""
-def update_state(query, state):
-    USER_STATE[query] = state
-"""
-USER_STATE = "PROCESSED"
-
-
+@contract()
 def update_state(state: str):
-    global USER_STATE
-    USER_STATE = state
+    """обновляет статус текущего сеанса - первое сообщение ставит статус 'CONFIRMED'"""
+    USER_STATE_dict[0] = {state}
 
 
-print(f'User_State: {USER_STATE}')
+@contract()
+def get_state()->str:
+    return USER_STATE_dict[0]
+
+
+print(f'User_State: {def get_state()}')
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -48,8 +40,8 @@ def command_handler(message: Message):
 
 @bot.callback_query_handler(func=lambda query: True)
 def callback_handler(callback_query):
-    if USER_STATE == "PROCESSED":
-        print(f'User_State: {USER_STATE}')
+    if get_state() == "PROCESSED":
+        print(f'User_State: {get_state()}')
         message = callback_query.message
         data = callback_query.data
         if data == 'problem_with_machine':
@@ -77,10 +69,10 @@ def callback_handler(callback_query):
             keyboard = keyboard_buttons.confirm()
             bot.send_message(message.chat.id, 'Подтвердите действие:', reply_markup=keyboard)
 
-    elif USER_STATE == "CONFIRMED":  # обработаем попытку нажать кнопки после подтверждения
+    elif get_state() == "CONFIRMED":  # обработаем попытку нажать кнопки после подтверждения
         message = callback_query.message
         bot.send_message(message.chat.id, '⚠️  Уже сохранено.')
-        print(f'User_State: {USER_STATE}')
+        print(f'User_State: {get_state()}')
 
 
 """
