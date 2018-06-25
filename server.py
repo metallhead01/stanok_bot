@@ -1,30 +1,46 @@
-import email_handler
-import time
-import requests
-import bot
+import asyncio
+import aiohttp
+from aiohttp import web
+import json
 
 with open('telegram.token', 'r') as f:
     token = f.read()
-
 TOKEN = token
-MAIN_URL = f'https://api.telegram.org/bot{TOKEN}'
+API_URL = f'https://api.telegram.org/bot{TOKEN}'
 
-while True:
-    li_st = email_handler.read_email_from_gmail()
-    i = 0
-    if li_st:
-        while i <= len(li_st):
-            element = li_st.pop()
-            payload = {
-                'chat_id': '149017157',
-                'text': element[2],
-            }
+
+async def handler(request):
+    data = await request.json()
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    message = {
+        'chat_id': data['message']['chat']['id'],
+        'text': data['message']['text']
+    }
+    async with aiohttp.ClientSession(loop=loop) as session:
+        async with session.post(API_URL,
+                                data=json.dumps(message),
+                                headers=headers) as resp:
             try:
-                r = requests.post(f'{MAIN_URL}/sendMessage', data=payload)
-                i += 1
-            except Exception as e:
-                print(str(e))
-    else:
-        print('wait')
+                assert resp.status == 200
+            except:
+                return web.Response(status=500)
+    return web.Response(status=200)
 
-    time.sleep(60)
+
+async def init_app(loop):
+    app = web.Application(loop=loop, middlewares=[])
+    app.router.add_post('/api/v1', handler)
+    return app
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    try:
+        app = loop.run_until_complete(init_app(loop))
+        web.run_app(app, host='0.0.0.0', port=443)
+    except Exception as e:
+        print('Error create server: %r' % e)
+    finally:
+        pass
+    loop.close()
