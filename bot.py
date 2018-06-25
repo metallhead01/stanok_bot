@@ -5,6 +5,7 @@ import telebot
 from telebot.types import Message
 import keyboard_buttons
 from contracts import contract
+import logging
 
 
 with open('telegram.token', 'r') as f:
@@ -13,18 +14,23 @@ TOKEN = token
 MAIN_URL = f'https://api.telegram.org/bot{TOKEN}'
 USER_STATE_dict = {}
 
-
 bot = telebot.TeleBot(TOKEN)
 
 
 @contract()
 def update_state(state: str):
+logger = telebot.logger
+telebot.logger.setLevel(logging.DEBUG)  # Outputs debug messages to console.
+
+
+@contract()
+def update_state(state: 'str'):
     """обновляет статус текущего сеанса - первое сообщение ставит статус 'CONFIRMED'"""
     USER_STATE_dict[0] = {state}
 
 
 @contract()
-def get_state()->str:
+def get_state()->'str':
     return USER_STATE_dict[0]
 
 
