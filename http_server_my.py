@@ -6,7 +6,6 @@
 
 import logging
 import ssl
-from aiohttp import web
 import telebot
 
 with open('telegram.token', 'r') as f:
@@ -24,9 +23,10 @@ WEBHOOK_URL_BASE = "https://{}:{}".format(WEBHOOK_HOST, WEBHOOK_PORT)
 WEBHOOK_URL_PATH = "/{}/".format(API_TOKEN)
 
 
+bot = telebot.TeleBot(API_TOKEN)
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
-bot = telebot.TeleBot(API_TOKEN)
+
 
 app = web.Application()
 

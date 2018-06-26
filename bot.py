@@ -8,9 +8,14 @@ from contracts import contract
 import logging
 
 
-with open('telegram.token', 'r') as f:
-    token = f.read()
-TOKEN = token
+@contract()
+def get_token(file_name: 'str')->'str':
+    with open(file_name, 'r') as f:
+        token = f.read()
+        return token
+
+
+TOKEN = get_token('telegram.token')
 MAIN_URL = f'https://api.telegram.org/bot{TOKEN}'
 USER_STATE_dict = {}
 
@@ -30,7 +35,7 @@ def get_state()->'str':
     return USER_STATE_dict[0]
 
 
-print(f'User_State: {def get_state()}')
+# print(f'User_State: {get_state()}')
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -99,6 +104,7 @@ while True:
 
     time.sleep(60)
 """
-bot.polling()  # Настройки таймаута, выбираем в зависимости от качества Интернет-соединения timeout=60
 
 
+if __name__ == '__main__':
+    bot.polling()  # Настройки таймаута, выбираем в зависимости от качества Интернет-соединения timeout=60
