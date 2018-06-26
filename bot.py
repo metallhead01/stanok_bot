@@ -15,10 +15,6 @@ MAIN_URL = f'https://api.telegram.org/bot{TOKEN}'
 USER_STATE_dict = {}
 
 bot = telebot.TeleBot(TOKEN)
-
-
-@contract()
-def update_state(state: str):
 logger = telebot.logger
 telebot.logger.setLevel(logging.DEBUG)  # Outputs debug messages to console.
 

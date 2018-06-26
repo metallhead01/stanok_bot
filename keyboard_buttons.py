@@ -45,8 +45,6 @@ def level_2_task():
         types.InlineKeyboardButton(text='a. Указать номер заказа', callback_data='set_order_number'),
         types.InlineKeyboardButton(text='⬅ Назад', callback_data='back')]
     level_2_task_keyboard.add(*level_2_task_buttons)
-    # level_2_task_keyboard.add(level_2_task_buttons[0])
-    # level_2_task_keyboard.add(level_2_task_buttons[1])
     return level_2_task_keyboard
 
 def level_2_warehouse():

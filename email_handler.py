@@ -1,6 +1,7 @@
 import imaplib
 import email
 import smtplib
+from contracts import contract
 
 
 # -------------------------------------------------
@@ -12,14 +13,17 @@ import smtplib
 # Just enable 2-step verification on your account.
 # Then generate one App-Specific-Password and use that to connect instead of your original password.
 
-ORG_EMAIL   = "@gmail.com"
-FROM_EMAIL  = "jamies.italian.it" + ORG_EMAIL
-FROM_PWD    = "zpjfzquiexnbnzau"
+ORG_EMAIL = "@gmail.com"
+FROM_EMAIL = "jamies.italian.it" + ORG_EMAIL
+FROM_PWD = "zpjfzquiexnbnzau"
 SMTP_SERVER = "imap.gmail.com"
-SMTP_PORT   = 993
+SMTP_PORT = 993
 
 
-def get_first_text_block(email_message_instance):  # http://python-3.ru/page/imap-email-python
+@contract
+def get_first_text_block(email_message_instance: email.message.Message)->'list':  # http://python-3.ru/page/imap-email-python
+    """Читаем внутренности письма, извлекаем содержимое"""
+
     maintype = email_message_instance.get_content_maintype()
     if maintype == 'multipart':
         for part in email_message_instance.get_payload():
@@ -29,7 +33,8 @@ def get_first_text_block(email_message_instance):  # http://python-3.ru/page/ima
         return email_message_instance.get_payload().split(', ')
 
 
-def read_email_from_gmail():
+@contract
+def read_email_from_gmail()->'list':
     emails_list = []
     try:
         mail = imaplib.IMAP4_SSL(SMTP_SERVER)
@@ -53,3 +58,6 @@ def read_email_from_gmail():
     except Exception as e:
         print(str(e))
 
+
+if __name__ == '__main__':
+    read_email_from_gmail()
