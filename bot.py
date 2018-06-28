@@ -9,17 +9,16 @@ import logging
 
 
 @contract()
-def get_token(file_name: 'str')->'str':
+def get_token(file_name: 'str' = 'telegram.token')->'str':
     with open(file_name, 'r') as f:
         token = f.read()
         return token
 
 
-TOKEN = get_token('telegram.token')
-MAIN_URL = f'https://api.telegram.org/bot{TOKEN}'
+MAIN_URL = f'https://api.telegram.org/bot{get_token()}'
 USER_STATE_dict = {}
 
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(get_token())
 logger = telebot.logger
 telebot.logger.setLevel(logging.DEBUG)  # Outputs debug messages to console.
 

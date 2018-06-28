@@ -1,47 +1,59 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# This is a simple echo bot using decorators and webhook with aiohttp
+# This is a simple echo bot using decorators and webhook with flask
 # It echoes any incoming text messages and does not use the polling method.
 
-import logging
-import ssl
+import flask
 import telebot
+import logging
+import time
 
-with open('telegram.token', 'r') as f:
-    token = f.read()
-API_TOKEN = token
 
-WEBHOOK_HOST = 'www.alextelebot.tk'
+def get_token(file_name: str = 'telegram.token')->str:
+    with open(file_name, 'r') as f:
+        token = f.read()
+        return token
+
+
+API_TOKEN = get_token()
+
+# WEBHOOK_HOST = 'www.alextelebot.tk'
+WEBHOOK_HOST = '80.240.30.130'
 WEBHOOK_PORT = 443  # 443, 80, 88 or 8443 (port need to be 'open')
 WEBHOOK_LISTEN = '80.240.30.130'  # In some VPS you may need to put here the IP addr
 
-WEBHOOK_SSL_CERT = 'cert1.pem'  # Path to the ssl certificate
-WEBHOOK_SSL_PRIV = 'privkey1.pem'  # Path to the ssl private key
+WEBHOOK_SSL_CERT = './cert1.pem'  # Path to the ssl certificate
+WEBHOOK_SSL_PRIV = './privkey1.pem'  # Path to the ssl private key
 
-WEBHOOK_URL_BASE = "https://{}:{}".format(WEBHOOK_HOST, WEBHOOK_PORT)
-WEBHOOK_URL_PATH = "/{}/".format(API_TOKEN)
+WEBHOOK_URL_BASE = "https://%s:%s" % (WEBHOOK_HOST, WEBHOOK_PORT)
+WEBHOOK_URL_PATH = "/%s/" % (API_TOKEN)
 
 
-bot = telebot.TeleBot(API_TOKEN)
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
 
+bot = telebot.TeleBot(API_TOKEN)
 
-app = web.Application()
+app = flask.Flask(__name__)
+
+
+# Empty webserver index, return nothing, just http 200
+@app.route('/', methods=['GET', 'HEAD'])
+def index():
+    return ''
 
 
 # Process webhook calls
-async def handle(request):
-    if request.match_info.get('token') == bot.token:
-        request_body_dict = await request.json()
-        update = telebot.types.Update.de_json(request_body_dict)
+@app.route(WEBHOOK_URL_PATH, methods=['POST'])
+def webhook():
+    if flask.request.headers.get('content-type') == 'application/json':
+        json_string = flask.request.get_data().decode('utf-8')
+        update = telebot.types.Update.de_json(json_string)
         bot.process_new_updates([update])
-        return web.Response()
+        return ''
     else:
-        return web.Response(status=403)
-
-app.router.add_post('/{token}/', handle)
+        flask.abort(403)
 
 
 # Handle '/start' and '/help'
@@ -61,18 +73,14 @@ def echo_message(message):
 # Remove webhook, it fails sometimes the set if there is a previous webhook
 bot.remove_webhook()
 
+time.sleep(5)
+
 # Set webhook
 bot.set_webhook(url=WEBHOOK_URL_BASE+WEBHOOK_URL_PATH,
                 certificate=open(WEBHOOK_SSL_CERT, 'r'))
 
-# Build ssl context
-context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-context.load_cert_chain(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV)
-
-# Start aiohttp server
-web.run_app(
-    app,
-    host=WEBHOOK_LISTEN,
-    port=WEBHOOK_PORT,
-    ssl_context=context,
-)
+# Start flask server
+app.run(host=WEBHOOK_LISTEN,
+        port=WEBHOOK_PORT,
+        ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
+        debug=True)
